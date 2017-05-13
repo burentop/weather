@@ -1,6 +1,6 @@
-
-
-
+var icon;
+var temp = 0;
+var fahrenheit = true;
 var lat;
 var long;
 
@@ -17,22 +17,40 @@ $(document).ready(function() {
 	else {
 	  alert("Geolocation is not supported by this browser");
 	}
+
+	$("#tempConvert").on("click", function(event) {
+		event.preventDefault();
+		if(fahrenheit) {
+			fahrCelsius();
+		} else {
+			celFahrenheit();
+		}
+	});
 	
 });
+
+
 
 function getWeather() {
 	$.ajax({
 	  dataType: 'jsonp',
 	  url: 'https://api.darksky.net/forecast/354a3c600fb639cddc3bb7e8ab3458a6/' + lat + ',' + long,
 	  success: function(data){
-	  	var temp = data['currently']['temperature'];
+	  	temp = data['currently']['temperature'];
 	  	var sky = data['currently']['cloudCover'];
 	  	var wind = data['currently']['windSpeed'];
+	  	icon = data['currently']['icon'];
 	    $("#temp").html(Math.round(temp) + " F");
-	    $("#sky").html(getCloud(sky));
+	    $("#sky").html(icon);
 	    $("#wind").html(Math.round(wind) + " mph");
+	    $("body").css({
+	    							'background': "url('img/" + icon + ".jpg')",
+	    							'background-repeat': "no-repeat",
+    								'background-size': "cover"
+	  	});
 	  }
 	});
+	fahrenheit = true;
 }
 
 function getPosition(position) {
@@ -87,4 +105,16 @@ function displayLocation(latitude,longitude){
     return address.city.short_name;
 	  }
 	}
+}
+
+function fahrCelsius() {
+	temp = (temp - 32) * (5 / 9);
+	fahrenheit = false;
+	$("#temp").html(Math.round(temp) + " C");
+}
+
+function celFahrenheit() {
+	temp = temp * (9 / 5) + 32;
+	fahrenheit = true;
+	$("#temp").html(Math.round(temp) + " F");
 }
